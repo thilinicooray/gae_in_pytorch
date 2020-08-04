@@ -106,7 +106,12 @@ class GAE(nn.Module):
 
 
     def get_embeddings(self):
-        z_mu, _ = self.encoder.eval()(self.x, self.adj_norm)
+        '''z_mu, _ = self.encoder.eval()(self.x, self.adj_norm)
         # Put encoder back into training mode
         self.encoder.train()
-        return z_mu
+        return z_mu'''
+        z_mu, z_sigma = self.encoder(self.x, self.adj_norm)
+
+        # Sample the latent code z
+        return pyro.sample("latent", dist.Normal(z_mu, z_sigma).to_event(2))
+
